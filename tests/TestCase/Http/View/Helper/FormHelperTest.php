@@ -113,13 +113,13 @@ class FormHelperTest extends OriginTestCase
 
         $helper = $this->Form;
         $helper->create($checkout);
-        
+
         // check value
         $this->assertStringContains('value="foo"', $helper->control('name'));
 
         // check parsing validation rules
         $this->assertStringContains('form-group text required', $helper->control('name'));
-        
+
         // check detection is working
         $this->assertStringContains('"form-group number"', $helper->control('age'));
         $this->assertStringContains('form-check checkbox', $helper->control('agree'));

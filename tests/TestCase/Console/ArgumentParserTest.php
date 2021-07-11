@@ -49,7 +49,7 @@ class ArgumentParserTest extends \PHPUnit\Framework\TestCase
     {
         $ap = new ArgumentParser();
         $ap->addOption('value1', ['type' => 'string','default' => 'foo']);
-    
+
         list($options, $arguments) = $ap->parse([]);
         $this->assertEquals('foo', $options['value1']);
 

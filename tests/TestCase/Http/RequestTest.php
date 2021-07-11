@@ -181,7 +181,7 @@ class RequestTest extends OriginTestCase
             'foo' => 'This is a test',
         ];
         $request = new MockRequest();
-    
+
         $this->assertEquals($expected, $request->cookies());
         $this->assertEquals('This is a test', $request->cookies('foo'));
 

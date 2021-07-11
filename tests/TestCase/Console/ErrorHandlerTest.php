@@ -99,9 +99,9 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $ErrorHandler = new MockErrorHandler();
         $ErrorHandler->register();
         $ErrorHandler->setup();
-        
+
         @unlink('fooooooo');
-       
+
         $this->assertTrue(true); // if we get here all is ok!
     }
 }

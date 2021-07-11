@@ -187,7 +187,7 @@ abstract class BaseSchema
         }
 
         return sprintf($sql, $this->quoteIdentifier($name), $this->quoteIdentifier($table), $column);
-        
+
         /*
          if (! empty($options['unique'])) {
              return "CREATE UNIQUE INDEX {$name} ON {$table} ({$column})";

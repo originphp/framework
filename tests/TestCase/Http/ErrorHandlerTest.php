@@ -63,7 +63,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         trigger_error('Undefined variable: unkown', E_USER_NOTICE);
         $result = ob_get_clean();
-               
+
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>NOTICE:</strong>', $result);
         $this->assertStringContainsString('Undefined variable: unkown', $result);
@@ -80,7 +80,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         trigger_error('This is a warning', E_USER_WARNING);
         $result = ob_get_clean();
-       
+
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>WARNING:</strong>', $result);
         $this->assertStringContainsString('This is a warning', $result);
@@ -97,13 +97,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         trigger_error('An error has occured', E_USER_ERROR);
         $result = ob_get_clean();
-       
+
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>ERROR:</strong>', $result);
         $this->assertStringContainsString('An error has occured', $result);
         $this->assertStringContainsString('line: <strong>98</strong>', $result);
     }
-    
+
     public function testErrorHandlerDeprecated()
     {
         $errorHandler = new ErrorHandler();
@@ -114,7 +114,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         trigger_error('Function has been deprecated', E_USER_DEPRECATED);
         $result = ob_get_clean();
-   
+
         $this->assertStringContainsString('<div class="origin-error">', $result);
         $this->assertStringContainsString('<strong>DEPRECATED:</strong>', $result);
         $this->assertStringContainsString('Function has been deprecated', $result);
@@ -128,13 +128,13 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         }
         $errorHandler = new ErrorHandler();
         $errorHandler->register();
-       
+
         Config::write('App.debug', true);
 
         ob_start();
         @include 'somefile.php';
         $result = ob_get_clean();
-      
+
         $this->assertEmpty($result);
     }
 
@@ -148,7 +148,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ob_start();
         $a = $unkown + 1;
         $result = ob_get_clean();
-        
+
         $this->assertEmpty($result);
     }
 
@@ -158,11 +158,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', true);
-       
+
         $errorHandler->exceptionHandler(
             new NotFoundException('passwords.txt could not be found')
         );
-    
+
         $this->assertStringContainsString('NotFoundException', $errorHandler->response());
         $this->assertStringContainsString('404', $errorHandler->response());
         $this->assertStringContainsString('passwords.txt could not be found', $errorHandler->response());
@@ -174,11 +174,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->exceptionHandler(
             new \Origin\Model\Exception\RecordNotFoundException('passwords.txt could not be found')
         );
-    
+
         $this->assertStringNotContainsString('NotFoundException', $errorHandler->response());
         $this->assertStringNotContainsString('404', $errorHandler->response());
         $this->assertStringNotContainsString('passwords.txt could not be found', $errorHandler->response());
@@ -191,11 +191,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->exceptionHandler(
             new \Origin\Core\Exception\Exception('passwords.txt could not be found')
         );
- 
+
         $this->assertStringNotContainsString('passwords.txt could not be found', $errorHandler->response());
         $this->assertStringContainsString('<h1>An Internal Error Has Occured</h1>', $errorHandler->response());
     }
@@ -210,7 +210,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', true);
-       
+
         $errorHandler->exceptionHandler(
             new NotFoundException('fetch not found')
         );
@@ -228,7 +228,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->exceptionHandler(
             new NotFoundException('Index not found')
         );
@@ -246,7 +246,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->exceptionHandler(
             new \Origin\Core\Exception\Exception('passwords.txt could not be found')
         );
@@ -264,7 +264,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->exceptionHandler(
             new ServiceUnavailableException()
         );
@@ -278,7 +278,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', true);
-       
+
         $errorHandler->fatalErrorHandler(E_ERROR, 'A Fatal Error has occured', 'dummy.php', 212);
         $this->assertStringContainsString('FatalErrorException', $errorHandler->response());
         $this->assertStringContainsString('500', $errorHandler->response());
@@ -291,9 +291,9 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errorHandler->register();
 
         Config::write('App.debug', false);
-       
+
         $errorHandler->fatalErrorHandler(E_ERROR, 'A Fatal Error has occured', 'dummy.php', 212);
-       
+
         $this->assertStringNotContainsString('FatalErrorException', $errorHandler->response());
         $this->assertStringNotContainsString('500', $errorHandler->response());
         $this->assertStringNotContainsString('A Fatal Error has occured', $errorHandler->response());
@@ -315,7 +315,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         if (file_exists($file)) {
             unlink($file);
         }
-      
+
         restore_error_handler();
         restore_exception_handler();
     }

@@ -370,7 +370,7 @@ class MysqlSchema extends BaseSchema
             $this->quoteIdentifier($from),
             $this->quoteIdentifier($to)
         );
-        
+
         //return  "RENAME TABLE {$from} TO {$to}";
     }
 

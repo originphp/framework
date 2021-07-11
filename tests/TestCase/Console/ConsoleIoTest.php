@@ -74,10 +74,10 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
         $io->write('downloading...');
         $this->assertEquals('downloading...', $this->stdout->read());
         $io->overwrite('completed');
-  
+
         $output = $this->stdout->read();
         $this->assertNotEquals('downloading...completed', $output);
-      
+
         $this->assertEquals(43, strlen($this->stdout->read())); // Not sure how to test this
     }
 
@@ -85,7 +85,7 @@ class ConsoleIoTest extends \PHPUnit\Framework\TestCase
     {
         $io = $this->io();
         $this->stdout->mode(ConsoleOutput::COLOR);
-        
+
         $io->write(['first line','second line']);
         $this->assertEquals("first line\nsecond line", $this->stdout->read());
         $io->overwrite('third line');

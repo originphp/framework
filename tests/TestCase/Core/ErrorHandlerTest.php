@@ -29,7 +29,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($stub->register());
         $result = $this->render($stub, 'exceptionHandler');
-   
+
         // if stop is mocked, then it does not return text
     }
 

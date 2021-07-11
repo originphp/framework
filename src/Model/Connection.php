@@ -335,7 +335,7 @@ abstract class Connection
         if ($this->connection->inTransaction()) {
             return false;
         }
-        
+
         $this->connection->beginTransaction();
 
         return $this->transactionStarted = true;
@@ -356,7 +356,7 @@ abstract class Connection
         if (! $this->connection->inTransaction()) {
             return false;
         }
-       
+
         return $this->connection->commit();
     }
 
@@ -370,7 +370,7 @@ abstract class Connection
         if (! $this->transactionStarted) {
             return false;
         }
-        
+
         $this->transactionStarted = false;
 
         if (! $this->connection->inTransaction()) {

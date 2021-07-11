@@ -61,14 +61,14 @@ class IntlHelperTest extends \PHPUnit\Framework\TestCase
     public function testLocales()
     {
         I18n::initialize(['locale' => 'en_GB']);
- 
+
         $locales = $this->Intl->locales();
         $this->assertEquals('English (United Kingdom)', $locales['en_GB']); // test with null value
     }
     public function testTimezones()
     {
         $timezones = $this->Intl->timezones();
-      
+
         $this->assertEquals('GMT +00:00 - UTC', $timezones['UTC']);
         $this->assertGreaterThanOrEqual(425, count($timezones)); // not sure if this varys on differen like locales
     }

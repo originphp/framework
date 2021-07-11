@@ -109,7 +109,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertMatchesRegularExpression($pattern, "admin' or 1>0");
         $this->assertMatchesRegularExpression($pattern, "admin'  or 1>0");
         $this->assertMatchesRegularExpression($pattern, "admin'  or 1>0");
-    
+
         $this->assertMatchesRegularExpression($pattern, "admin' AND 1=0");
         $this->assertMatchesRegularExpression($pattern, "admin'  AND 1=1");
 
@@ -123,7 +123,7 @@ class IdsRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertDoesNotMatchRegularExpression($pattern, '1 = 2');
         $this->assertDoesNotMatchRegularExpression($pattern, 'FOR = 4');
 //        $this->assertNoTRegExp($pattern, "abc 1 having equals (=) --");
-      
+
         # Keep here for reference
         $this->assertDoesNotMatchRegularExpression($pattern, "'gameofthrones' OR 'vikings'");
         $this->assertDoesNotMatchRegularExpression($pattern, "'gameofthrones' AND -something else");

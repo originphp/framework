@@ -545,14 +545,14 @@ class SqliteSchemaTest extends OriginTestCase
             'column' => ['id'],
             'type' => 'index',
         ];
- 
+
         $this->assertEquals($expected, $indexes[0]);
-       
+
         // Tests multi column index  + normal index type
         $sql = $adapter->addIndex('articles', ['id','author_id'], 'test_multicolumn_index');
         $this->assertTrue($adapter->connection()->execute($sql));
         $indexes = $adapter->indexes('articles');
-    
+
         $expected = [
             'name' => 'test_multicolumn_index',
             'column' => ['id','author_id'],
@@ -711,9 +711,9 @@ class SqliteSchemaTest extends OriginTestCase
         if ($adapter->connection()->engine() !== 'sqlite') {
             $this->markTestSkipped('This test is for sqlite');
         }
-       
+
         $tables = $adapter->tables();
-   
+
         $this->assertEquals(['articles','deals','posts','users'], $tables); // assert equals crashing phpunit
     }
 }

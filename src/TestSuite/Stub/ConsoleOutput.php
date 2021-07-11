@@ -36,7 +36,7 @@ class ConsoleOutput extends BaseConsoleOutput
 
         return strlen($buffer);
     }
- 
+
     public function read()
     {
         return $this->buffer;

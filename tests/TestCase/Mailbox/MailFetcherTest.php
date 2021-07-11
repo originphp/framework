@@ -130,7 +130,7 @@ class MailFetcherTest extends \PHPUnit\Framework\TestCase
         ]);
         // there may or may not be messages if we keep running tests
         $messages = $fetcher->download(['limit' => 1]);
-        
+
         $this->assertInstanceOf(Generator::class, $messages);
         if ($fetcher->count() === 0) {
             unset($fetcher); // Close connection

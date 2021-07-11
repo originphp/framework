@@ -308,11 +308,11 @@ class MarshallerTest extends OriginTestCase
     {
         $Article = $this->loadModel('Article', ['className' => Article::class]);
         $this->loadModel('Comment', ['className' => Comment::class]);
-        
+
         $Article->hasMany('Comment');
 
         $record = $Article->get(1000, ['associated' => ['Comment']]);
- 
+
         $requestData = [
             'title' => 'Article #1',
             'comments' => [

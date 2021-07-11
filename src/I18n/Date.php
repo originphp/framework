@@ -217,7 +217,7 @@ class Date
         $pattern = $formatter->getPattern();
         $hasDate = (stripos($pattern, 'y') !== false);
         $hasTime = (stripos($pattern, 'h') !== false);
-   
+
         $returnFormat = 'Y-m-d H:i:s';
         if ($hasTime && ! $hasDate) {
             $returnFormat = 'H:i:s';
@@ -293,7 +293,7 @@ class Date
         if ($format === null) {
             $format = self::$datetimeFormat;
         }
-       
+
         $formatter = self::formatter($format);
 
         $timestamp = $formatter->parse($dateString);

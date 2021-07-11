@@ -80,7 +80,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
             return true;
         }, [$obj])->everyMinute()->processes(3)->limit(2);
- 
+
         $schedule->dispatch();
         $this->assertEquals(2, $obj->counter); # Counter does not increase as PID still running
     }

@@ -268,10 +268,10 @@ class MysqlSchemaTest extends OriginTestCase
     {
         $adapter = new MysqlSchema('test');
         $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255)';
-        
+
         $result = $adapter->addColumn('apples', 'colour', 'string');
         $this->assertEquals($expected, $result);
-        
+
         // Test limit
         $result = $adapter->addColumn('apples', 'colour', 'string', ['limit' => 40]);
         $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(40)';
@@ -282,7 +282,7 @@ class MysqlSchemaTest extends OriginTestCase
         $this->assertEquals($expected, $result);
 
         # # # TEST DEFAULTS
-        
+
         // test default not null
         $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) NOT NULL DEFAULT \'foo\'';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['default' => 'foo','null' => false]);
@@ -302,7 +302,7 @@ class MysqlSchemaTest extends OriginTestCase
         $expected = 'ALTER TABLE `apples` ADD COLUMN `colour` VARCHAR(255) NOT NULL';
         $result = $adapter->addColumn('apples', 'colour', 'string', ['null' => false]);
         $this->assertEquals($expected, $result);
-        
+
         // test precision
         $expected = 'ALTER TABLE `apples` ADD COLUMN `price` DECIMAL(7,0)';
         $result = $adapter->addColumn('apples', 'price', 'decimal', ['precision' => 7]);

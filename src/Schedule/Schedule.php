@@ -177,7 +177,7 @@ class Schedule
                     unset($backgroundEvents[$key]);
                 }
             }
-            
+
             usleep(250000); // 0.25 seconds
         }
     }
