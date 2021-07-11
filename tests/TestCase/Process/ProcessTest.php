@@ -10,9 +10,9 @@ class ProcessTest extends OriginTestCase
     {
         $process = new Process(['git','--version']);
         $process->execute();
-        $this->assertStringContains('git version', $process->output());
+        $this->assertStringContains('git version', $process->getOutput());
 
-        $this->assertEmpty($process->error());
+        $this->assertEmpty($process->getErrorOutput());
         $this->assertEquals(0, $process->exitCode());
     }
 
@@ -20,9 +20,9 @@ class ProcessTest extends OriginTestCase
     {
         $process = new Process('echo "the ${FOO} brown fox"', ['escape' => false,'env' => ['FOO' => 'quick']]);
         $process->execute();
-        $this->assertStringContains('the quick brown fox', $process->output());
+        $this->assertStringContains('the quick brown fox', $process->getOutput());
 
-        $this->assertEmpty($process->error());
+        $this->assertEmpty($process->getErrorOutput());
         $this->assertEquals(0, $process->exitCode());
     }
 
@@ -30,10 +30,10 @@ class ProcessTest extends OriginTestCase
     {
         $process = new Process(['cat','foo']);
         $process->execute();
-        $this->assertStringContains('cat: foo: No such file or directory', $process->error());
+        $this->assertStringContains('cat: foo: No such file or directory', $process->getErrorOutput());
        
-        $this->assertEmpty($process->output());
-        $this->assertNotEmpty($process->error());
+        $this->assertEmpty($process->getOutput());
+        $this->assertNotEmpty($process->getErrorOutput());
         $this->assertEquals(1, $process->exitCode());
     }
 }

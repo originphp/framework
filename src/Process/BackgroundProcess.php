@@ -123,7 +123,11 @@ class BackgroundProcess extends BaseProcess
         }
 
         $this->process = proc_open(
-            $this->command, $this->descriptorspec(), $this->pipes, $this->directory, $this->env
+            $this->command,
+            $this->descriptorspec(),
+            $this->pipes,
+            $this->directory,
+            $this->env
         );
 
         if (! is_resource($this->process)) {
@@ -164,7 +168,7 @@ class BackgroundProcess extends BaseProcess
      *
      * @return integer|null
      */
-    public function pid(): ? int
+    public function getPid(): ? int
     {
         return $this->status('pid');
     }
@@ -189,7 +193,7 @@ class BackgroundProcess extends BaseProcess
             usleep(1000);
         }
 
-        return $this->exitCode();
+        return $this->getExitCode();
     }
 
     /**
@@ -210,7 +214,7 @@ class BackgroundProcess extends BaseProcess
             if (! $this->isRunning()) {
                 return false;
             }
-            if ($callback($this->output(), $this->error()) === true) {
+            if ($callback($this->getOutput(), $this->getErrorOutput()) === true) {
                 return true;
             }
 
@@ -264,7 +268,7 @@ class BackgroundProcess extends BaseProcess
      *
      * @return string
      */
-    public function output(): string
+    public function getOutput(): string
     {
         $this->readOutput();
 
@@ -276,7 +280,7 @@ class BackgroundProcess extends BaseProcess
      *
      * @return string
      */
-    public function error(): string
+    public function getErrorOutput(): string
     {
         $this->readError();
 
@@ -321,7 +325,7 @@ class BackgroundProcess extends BaseProcess
     /**
      * @return integer|null
      */
-    public function exitCode(): ?int
+    public function getExitCode(): ?int
     {
         return $this->status('exitcode');
     }
@@ -472,12 +476,74 @@ class BackgroundProcess extends BaseProcess
      *
      * @return boolean
      */
-    public function success(): bool
+    public function isSuccess(): bool
     {
         if (empty($this->status)) {
             throw new LogicException('The process was not started');
         }
 
-        return $this->exitCode() === 0;
+        return $this->getExitCode() === 0;
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return boolean
+     */
+    public function success(): bool
+    {
+        // does not require core/functions
+        trigger_error('BackgroundProcess::success has been deprecated use BackgroundProcess::isSuccess instead', E_USER_DEPRECATED);
+    
+        return $this->isSuccess();
+    }
+
+    /**
+        * @deprecated 3.26.0
+        * @codeCoverageIgnore
+        * @return string
+        */
+    public function output(): string
+    {
+        // does not require core/functions
+        trigger_error('BackgroundProcess::output has been deprecated use PrBackgroundProcess::getOutput instead', E_USER_DEPRECATED);
+
+        return $this->getOutput();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return string
+     */
+    public function error(): string
+    {
+        trigger_error('BackgroundProcess::error has been deprecated use BackgroundProcess::getErrorOutput instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutput();
+    }
+
+    /**
+    * @deprecated 3.26.0
+    * @codeCoverageIgnore
+    * @return integer|null
+    */
+    public function exitCode(): ?int
+    {
+        trigger_error('BackgroundProcess::exitCode has been deprecated use BackgroundProcess::getExitCode instead', E_USER_DEPRECATED);
+
+        return $this->getExitCode();
+    }
+
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return int
+     */
+    public function pid(): ? int
+    {
+        trigger_error('BackgroundProcess::pid has been deprecated use BackgroundProcess::getPid instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutput();
     }
 }

@@ -74,8 +74,8 @@ class Process extends BaseProcess
         $process->start();
         $process->wait();
 
-        $this->stdout = $process->output();
-        $this->stderr = $process->error();
+        $this->stdout = $process->getOutput();
+        $this->stderr = $process->getErrorOutput();
 
         $this->exitCode = $process->exitCode();
 
@@ -87,7 +87,7 @@ class Process extends BaseProcess
      *
      * @return integer|null
      */
-    public function exitCode(): ? int
+    public function getExitCode(): ? int
     {
         return $this->exitCode;
     }
@@ -97,7 +97,7 @@ class Process extends BaseProcess
      *
      * @return string
      */
-    public function output(): string
+    public function getOutput(): string
     {
         return $this->stdout;
     }
@@ -107,8 +107,45 @@ class Process extends BaseProcess
      *
      * @return string|null
      */
-    public function error(): ? string
+    public function getErrorOutput(): ? string
     {
         return $this->stderr;
+    }
+
+    /**
+       * @deprecated 3.26.0
+       * @codeCoverageIgnore
+       * @return string
+       */
+    public function output(): string
+    {
+        // does not require core/functions
+        trigger_error('Process::output has been deprecated use Process::getOutput instead', E_USER_DEPRECATED);
+    
+        return $this->getOutput();
+    }
+    
+    /**
+     * @deprecated 3.26.0
+     * @codeCoverageIgnore
+     * @return string
+     */
+    public function error(): string
+    {
+        trigger_error('Process::error has been deprecated use Process::getErrorOutput instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutput();
+    }
+    
+    /**
+    * @deprecated 3.26.0
+    * @codeCoverageIgnore
+    * @return integer|null
+    */
+    public function exitCode(): ?int
+    {
+        trigger_error('Process::exitCode has been deprecated use Process::getExitCode instead', E_USER_DEPRECATED);
+
+        return $this->getExitCode();
     }
 }

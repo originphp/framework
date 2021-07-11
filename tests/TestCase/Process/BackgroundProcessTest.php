@@ -11,9 +11,9 @@ class BackgroundProcessTest extends OriginTestCase
     public function testPid()
     {
         $process = new BackgroundProcess('sleep 1', ['escape' => false]);
-        $this->assertNull($process->pid());
+        $this->assertNull($process->getPid());
         $process->start();
-        $this->assertIsInt($process->pid());
+        $this->assertIsInt($process->getPid());
     }
     public function testStart()
     {
@@ -23,17 +23,17 @@ class BackgroundProcessTest extends OriginTestCase
         $this->assertTrue($process->isRunning());
         sleep(1);
    
-        $this->assertStringContains('started', $process->output());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringContains('started', $process->getOutput());
+        $this->assertStringNotContains('completed', $process->getOutput());
         $this->assertEquals(-1, $process->exitCode());
         
         sleep(3);
         $this->assertFalse($process->isRunning());
-        $this->assertStringContains('started', $process->output());
-        $this->assertStringContains('completed', $process->output());
+        $this->assertStringContains('started', $process->getOutput());
+        $this->assertStringContains('completed', $process->getOutput());
 
         $this->assertEquals(0, $process->exitCode());
-        $this->assertTrue($process->success());
+        $this->assertTrue($process->isSuccess());
     }
 
     public function testErrorStart()
@@ -41,9 +41,9 @@ class BackgroundProcessTest extends OriginTestCase
         $process = new BackgroundProcess(['cat','foo']);
         $process->start();
         $process->wait();
-        $this->assertStringContains('cat: foo: No such file or directory', $process->error());
+        $this->assertStringContains('cat: foo: No such file or directory', $process->getErrorOutput());
         $this->assertEquals(1, $process->exitCode());
-        $this->assertFalse($process->success());
+        $this->assertFalse($process->isSuccess());
     }
 
     public function testErrorWait()
@@ -64,7 +64,7 @@ class BackgroundProcessTest extends OriginTestCase
     {
         $process = new BackgroundProcess(['ls -la']);
         $this->expectException(LogicException::class);
-        $process->success();
+        $process->isSuccess();
     }
 
     public function testErrorExitCode()
@@ -103,8 +103,8 @@ class BackgroundProcessTest extends OriginTestCase
     
         sleep(3);
         $this->assertFalse($process->isRunning());
-        $this->assertStringNotContains('started', $process->output());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringNotContains('started', $process->getOutput());
+        $this->assertStringNotContains('completed', $process->getOutput());
 
         $this->assertEquals(0, $process->exitCode());
     }
@@ -116,14 +116,14 @@ class BackgroundProcessTest extends OriginTestCase
         $this->assertTrue($process->isRunning());
         sleep(1);
 
-        $this->assertStringContains('started', $process->output());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringContains('started', $process->getOutput());
+        $this->assertStringNotContains('completed', $process->getOutput());
         $this->assertTrue($process->stop());
     
         sleep(1);
         $this->assertFalse($process->isRunning());
-        $this->assertStringContains('started', $process->output());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringContains('started', $process->getOutput());
+        $this->assertStringNotContains('completed', $process->getOutput());
     }
 
     public function testTimeout()
@@ -135,7 +135,7 @@ class BackgroundProcessTest extends OriginTestCase
         sleep(4);
         $this->assertTrue($process->isRunning());
         $this->assertTrue($process->hasTimedOut());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringNotContains('completed', $process->getOutput());
     }
 
     public function testWait()
@@ -144,11 +144,11 @@ class BackgroundProcessTest extends OriginTestCase
         $process->start();
 
         $this->assertTrue($process->isRunning());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringNotContains('completed', $process->getOutput());
         $process->wait();
       
         $this->assertFalse($process->isRunning());
-        $this->assertStringContains('completed', $process->output());
+        $this->assertStringContains('completed', $process->getOutput());
     }
 
     public function testWaitUntil()
@@ -161,8 +161,8 @@ class BackgroundProcessTest extends OriginTestCase
         });
         $this->assertTrue($found);
       
-        $this->assertStringContains('started', $process->output());
-        $this->assertStringContains('ready', $process->output());
-        $this->assertStringNotContains('completed', $process->output());
+        $this->assertStringContains('started', $process->getOutput());
+        $this->assertStringContains('ready', $process->getOutput());
+        $this->assertStringNotContains('completed', $process->getOutput());
     }
 }
