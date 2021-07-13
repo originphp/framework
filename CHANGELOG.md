@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.26.0] - 2021-07-11
+## [3.26.0] - 2021-07-13
 
 ### Fixed
 
@@ -9,7 +9,7 @@
 
 ### Deprecated
 
-A new originphp repo for rector upgrades will be added which will cover these.
+Use [originphp/rector](https://github.com/originphp/rector) to automatically refactor your code.
 
 - Deprecated BackgroundProcesss::output use BackgroundProcess::getOutput
 - Deprecated BackgroundProcesss::error use BackgroundProcess::getError
