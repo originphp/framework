@@ -180,6 +180,12 @@ class QueryTest extends OriginTestCase
         $query = $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['table' => 'authors']);
         $this->assertEquals($expected, $query->sql());
 
+        $query = $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['table' => 'authors','conditions' => [
+            'articles.author_id = 1234' // so we can find
+        ]]);
+        $expected = 'SELECT articles.id, articles.author_id, articles.title, authors.id, authors.name FROM `articles` INNER JOIN `authors` ON (articles.author_id = 1234)';
+        $this->assertEquals($expected, $query->sql());
+
         $this->expectException(InvalidArgumentException::class);
         $this->Article->select(['id', 'author_id', 'title', 'authors.id', 'authors.name'])->join(['foo' => 'bar']);
     }

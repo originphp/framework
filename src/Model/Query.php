@@ -216,7 +216,7 @@ class Query implements IteratorAggregate
             $options['alias'] = $options['table'];
         }
 
-        if (empty($conditions)) {
+        if (empty($options['conditions'])) {
             $tableAlias = Inflector::tableName($this->model->alias());
             $foreignKey = Inflector::singular($options['table']) . '_id';
             $options['conditions'] = [

@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed Form helper not setting max length when using Record objects
+- Fixed Query object join statement conditions option
 
 ## [3.26.0] - 2021-07-13
 
