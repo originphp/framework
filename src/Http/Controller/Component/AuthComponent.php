@@ -228,7 +228,6 @@ class AuthComponent extends Component
      */
     public function login(Entity $user): void
     {
-        $this->Session = $this->Session;
         $this->Session->write('Auth.User', $user->toArray());
     }
 
