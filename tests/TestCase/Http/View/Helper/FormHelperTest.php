@@ -117,6 +117,9 @@ class FormHelperTest extends OriginTestCase
         // check value
         $this->assertStringContains('value="foo"', $helper->control('name'));
 
+        // check length are set
+        $this->assertStringContains('<div class="form-group text required"><label for="email">Email</label><input type="text" name="email" class="form-control" id="email" maxlength="125" value="foo@example.com"></div>', $helper->control('email'));
+
         // check parsing validation rules
         $this->assertStringContains('form-group text required', $helper->control('name'));
 
