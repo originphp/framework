@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.26.14] - 2021-07-14
+
+### Fixed
+
+- Fixed Form helper not setting max length when using Record objects
+
 ## [3.26.0] - 2021-07-13
 
 ### Fixed

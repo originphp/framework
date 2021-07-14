@@ -266,7 +266,7 @@ class FormHelper extends Helper
 
             $meta['columnMap'][$field] = $type;
 
-            if (empty($row['limit']) === false && $type != 'boolean') {
+            if (! empty($settings['length']) && $type != 'boolean') {
                 $meta['maxlength'][$field] = $settings['length'];
             }
         }
