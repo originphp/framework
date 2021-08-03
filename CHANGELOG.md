@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.27.0] - [tba]
+
+### Added
+
+- Added individual disabling select options in FormHelper by passing an array
+
 ## [3.26.2] - 2021-08-03
 
 ### Fixed
