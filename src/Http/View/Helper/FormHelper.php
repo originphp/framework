@@ -1038,17 +1038,22 @@ class FormHelper extends Helper
         if (! isset($options['value'])) {
             if ($this->entity) {
                 $entity = $this->getEntity($this->entity, $name);
-                $parts = explode('.', $name);
-                $last = end($parts);
 
-                // Get value unless overridden
-                if (isset($entity->$last) && is_scalar($entity->$last)) {
-                    $options['value'] = $entity->$last;
-                }
-
-                // Check Validation Errors
-                if ($entity && $entity->errors($last)) {
-                    $options = $this->addClass('error', $options);
+                if ($entity) {
+                    $parts = explode('.', $name);
+                    $last = end($parts);
+    
+                    $value = $entity->$last;
+    
+                    // Get value unless overridden
+                    if (($value !== null || $value !== '') && is_scalar($value)) {
+                        $options['value'] = $value ;
+                    }
+    
+                    // Check Validation Errors
+                    if ($entity && $entity->errors($last)) {
+                        $options = $this->addClass('error', $options);
+                    }
                 }
             } else {
                 // get data from request, if user is using different model or not supplying results. e.g is a search form
@@ -1057,7 +1062,8 @@ class FormHelper extends Helper
                 if ($data) {
                     $dot = new Dot($data);
                     $value = $dot->get($name);
-                    if ($value) {
+                    // 0 can be a valid value for a select
+                    if (($value !== null || $value !== '') && is_scalar($value)) {
                         $options['value'] = $value;
                     }
                 }
@@ -1119,9 +1125,10 @@ class FormHelper extends Helper
         if (strpos($path, '.') === false) {
             return $entity;
         }
-
+        
         foreach (explode('.', $path) as $key) {
             $lastEntity = $entity;
+
             if (is_object($entity) && isset($entity->$key)) {
                 $entity = $entity->$key;
             } elseif ((is_array($entity) || $entity instanceof Collection) && isset($entity[$key])) {
