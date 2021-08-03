@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.26.2] - 2021-08-03
+
+### Fixed
+
+- Fixed Command::runCommand which was silently exiting if the command it ran exited or aborted
+- Fixed BaseEntity::toArray not converting values which are arrays and have scalar properties.
+- Fixed FormHelper throwing error if entity value is not returned
+
 ## [3.26.1] - 2021-07-14
 
 ### Fixed
