@@ -180,8 +180,12 @@ abstract class Command
             $argv[] = '--verbose';
         }
 
-        $result = $instance->run($argv);
-
+        try {
+            $result = $instance->run($argv);
+        } catch (StopExecutionException $exception) {
+            $result = $exception->getCode();
+        }
+      
         $this->io->level($defaultLevel);
 
         return $result;
