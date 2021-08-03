@@ -70,7 +70,7 @@ class FormHelper extends Helper
             'label' => '<label for="{name}"{attributes}>{text}</label>',
             'radio' => '<input type="radio" name="{name}" value="{value}"{attributes}>',
             'select' => '<select name="{name}"{attributes}>{content}</select>',
-            'option' => '<option value="{value}">{text}</option>',
+            'option' => '<option value="{value}"{attributes}>{text}</option>',
             'optionSelected' => '<option value="{value}" selected>{text}</option>',
             'optgroup' => '<optgroup label="{label}">{content}</optgroup>',
             'textarea' => '<textarea name="{name}"{attributes}>{value}</textarea>',
@@ -927,7 +927,15 @@ class FormHelper extends Helper
         }
         unset($selectOptions['empty']);
 
-        $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions);
+        // remove individual selected
+        $disabled = [];
+    
+        if (array_key_exists('disabled', $selectOptions) && is_array($selectOptions['disabled'])) {
+            $disabled = $selectOptions['disabled'];
+            unset($selectOptions['disabled']);
+        }
+
+        $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions, $disabled);
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);
         }
@@ -977,9 +985,10 @@ class FormHelper extends Helper
      *
      * @param array $options
      * @param array $selectOptions
+     * @param array $disabled
      * @return string
      */
-    private function buildSelectOptions(array $options, array $selectOptions = []): string
+    private function buildSelectOptions(array $options, array $selectOptions = [], array $disabled = []): string
     {
         $selectOptions += ['value' => null];
 
@@ -993,17 +1002,16 @@ class FormHelper extends Helper
                 continue;
             }
 
-            $template = $this->config['templates']['option'];
-
+            $template = 'option';
             /**
              * @internal careful here url params vs database values can be string/int but same so use
              * strval
              */
+
             if (! $noneSelected && strval($selectOptions['value']) === strval($key)) {
-                $template = $this->config['templates']['optionSelected'];
+                $template = 'optionSelected';
             }
-            $template = str_replace('{value}', (string) $key, $template);
-            $output .= str_replace('{text}', (string) $value, $template);
+            $output .= $this->formatTemplate($template, ['value' => $key,'text' => $value,'disabled' => in_array($key, $disabled)]);
         }
 
         return $output;
