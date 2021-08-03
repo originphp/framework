@@ -220,6 +220,8 @@ class BaseEntity
                 foreach ($value as $k => $v) {
                     if (is_object($v) && method_exists($v, 'toArray')) {
                         $out[$property][$k] = $v->toArray();
+                    } elseif (is_scalar($v)) {
+                        $out[$property][$k] = $v;
                     }
                 }
                 continue;
