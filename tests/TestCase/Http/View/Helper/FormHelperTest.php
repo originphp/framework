@@ -294,10 +294,16 @@ class FormHelperTest extends OriginTestCase
         $this->assertEquals($expected, $FormHelper->textarea('description'));
     }
 
-    public function testSelect()
+    public function testSelectDisabled()
     {
         $FormHelper = $this->Form;
 
+        $expected = '<select name="status"><option value="0">draft</option><option value="1" disabled>new</option><option value="2">published</option></select>';
+        $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published'], ['disabled' => ['new']]));
+    }
+
+    public function testSelect()
+    {
         $expected = '<select name="status"><option value="0">draft</option><option value="1">new</option><option value="2">published</option></select>';
         $this->assertEquals($expected, $FormHelper->select('status', ['draft', 'new', 'published']));
 
