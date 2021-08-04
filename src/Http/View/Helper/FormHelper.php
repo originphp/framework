@@ -72,7 +72,7 @@ class FormHelper extends Helper
             'select' => '<select name="{name}"{attributes}>{content}</select>',
             'option' => '<option value="{value}"{attributes}>{text}</option>',
             'optionSelected' => '<option value="{value}" selected>{text}</option>',
-            'optgroup' => '<optgroup label="{label}">{content}</optgroup>',
+            'optgroup' => '<optgroup label="{label}"{attributes}>{content}</optgroup>',
             'textarea' => '<textarea name="{name}"{attributes}>{value}</textarea>',
             'postLink' => '<a href="#"{attributes}>{text}</a>',
             'onclickConfirm' => 'if (confirm(&quot;{message}&quot;)) { document.{name}.submit(); } event.returnValue = false; return false;',
@@ -918,6 +918,7 @@ class FormHelper extends Helper
     public function select(string $name, array $options = [], array $selectOptions = []): string
     {
         $selectOptions = $this->prepareOptions($name, $selectOptions);
+        $selectOptions += ['escape' => true];
 
         if (! empty($selectOptions['empty'])) {
             if ($selectOptions['empty'] === true) {
@@ -929,13 +930,16 @@ class FormHelper extends Helper
 
         // remove individual selected
         $disabled = [];
+
+        $escape = $selectOptions['escape'];
+        unset($selectOptions['escape']);
     
         if (array_key_exists('disabled', $selectOptions) && is_array($selectOptions['disabled'])) {
             $disabled = $selectOptions['disabled'];
             unset($selectOptions['disabled']);
         }
 
-        $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions, $disabled);
+        $selectOptions['content'] = $this->buildSelectOptions($options, $selectOptions, $disabled, $escape);
         if (array_key_exists('value', $selectOptions)) { // Work with null values
             unset($selectOptions['value']);
         }
@@ -988,7 +992,7 @@ class FormHelper extends Helper
      * @param array $disabled
      * @return string
      */
-    private function buildSelectOptions(array $options, array $selectOptions = [], array $disabled = []): string
+    private function buildSelectOptions(array $options, array $selectOptions = [], array $disabled = [], bool $escape = true): string
     {
         $selectOptions += ['value' => null];
 
@@ -997,8 +1001,13 @@ class FormHelper extends Helper
         $output = '';
         foreach ($options as $key => $value) {
             if (is_array($value)) {
-                $optgroup = str_replace('{label}', $key, $this->config['templates']['optgroup']);
-                $output .= str_replace('{content}', $this->buildSelectOptions($value), $optgroup);
+                //  $optgroup = str_replace('{label}', $key, $this->config['templates']['optgroup']);
+                //  $output .= str_replace('{content}', $this->buildSelectOptions($value), $optgroup);
+                $output .= $this->formatTemplate('optgroup', [
+                    'escape' => $escape,
+                    'label' => $key,
+                    'content' => $this->buildSelectOptions($value, $selectOptions, $disabled, $escape)
+                ]);
                 continue;
             }
 
@@ -1011,7 +1020,7 @@ class FormHelper extends Helper
             if (! $noneSelected && strval($selectOptions['value']) === strval($key)) {
                 $template = 'optionSelected';
             }
-            $output .= $this->formatTemplate($template, ['value' => $key,'text' => $value,'disabled' => in_array($key, $disabled)]);
+            $output .= $this->formatTemplate($template, ['escape' => $escape,'value' => $key,'text' => $value,'disabled' => in_array($value, $disabled)]);
         }
 
         return $output;

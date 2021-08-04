@@ -106,4 +106,21 @@ class Debugger
 
         return $result;
     }
+
+    public static function printVar($data, string $filename, string $lineNo, bool $isHtml) : void
+    {
+        $data = print_r($data, true);
+        if ($isHtml) {
+            $data = h($data);
+        }
+
+        if (isConsole()) {
+            $where = "{$filename} Line: {$lineNo}";
+            $template = sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
+        } else {
+            $where = "<p><strong>{$filename}</strong> Line: <strong>{$lineNo}</strong></p>";
+            $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
+        }
+        printf("\n%s\n", $template); // allow to work with %s
+    }
 }
