@@ -60,19 +60,7 @@ if (! function_exists('debug')) {
             $filename = Resolver::trimPath($backtrace[0]['file']);
             $line = $backtrace[0]['line'];
 
-            $data = print_r($data, true);
-            if ($isHtml) {
-                $data = h($data);
-            }
-
-            if (isConsole()) {
-                $where = "{$filename} Line: {$line}";
-                $template = sprintf("# # # # # DEBUG # # # # #\n%s\n\n%s\n\n# # # # # # # # # # # # #\n", $where, $data);
-            } else {
-                $where = "<p><strong>{$filename}</strong> Line: <strong>{$line}</strong></p>";
-                $template = sprintf('<div class="origin-debug"><p>%s</p><pre>%s</pre></div>', $where, $data);
-            }
-            printf("\n%s\n", $template); // allow to work with %s
+            (new Debugger)->printVar($data, $filename, $line, $isHtml);
         }
     }
 }
@@ -350,5 +338,27 @@ if (! function_exists('temp_name')) {
         }
 
         return sys_get_temp_dir() . '/' . $prefix . $out;
+    }
+}
+
+if (! function_exists('dd')) {
+    /**
+     * Debug and die.
+     *
+     * @param mixed $data
+     * @param boolean $isHtml if set to true data will passed through htmlspecialchars
+     * @return void
+     */
+    function dd($data, bool $isHtml = false): void
+    {
+        if (debugEnabled()) {
+            $backtrace = debug_backtrace();
+
+            $filename = Resolver::trimPath($backtrace[0]['file']);
+            $line = $backtrace[0]['line'];
+
+            (new Debugger)->printVar($data, $filename, $line, $isHtml);
+            die(1);
+        }
     }
 }
