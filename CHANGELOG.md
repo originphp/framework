@@ -1,10 +1,15 @@
 # Changelog
 
-## [3.27.0] - [tba]
+## [3.27.0] - 2021-08-04
 
 ### Added
 
-- Added individual disabling select options in FormHelper by passing an array
+- Added disabling individual select options in FormHelper by passing an array
+- Added dd (debug and die) helper fuction
+
+# Security
+
+- Added escaping on select option values
 
 ## [3.26.2] - 2021-08-03
 
