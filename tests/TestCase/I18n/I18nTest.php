@@ -126,10 +126,13 @@ class I18nTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Hola Mundo', __('hello world'));
         $this->assertEquals('Hola Jim', __('Hello {name}', ['name' => 'Jim']));
         $this->assertEquals('Hay 0 manzanas', __('There is one apple|There are {count} apples', ['count' => 0]));
+        $this->assertEquals('There are zero apples', __('There are zero apples|There is one apple|There are {count} apples', ['count' => 0]));
         $this->assertEquals('Hay una manzana', __('There is one apple|There are {count} apples', ['count' => 1]));
         $this->assertEquals('Hay 2 manzanas', __('There is one apple|There are {count} apples', ['count' => 2]));
+        $this->assertEquals('7', __('0|1|2|3|4|5|6|7', ['count' => 7]));
     }
 
+ 
     public function testLoadMessagesException()
     {
         $this->expectException(Exception::class);

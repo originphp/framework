@@ -271,15 +271,15 @@ class I18n
                 array_unshift($messages, $messages[1]); // If zero not set use other as zero.
             }
             // use count number if set, if not use the last.
-            $message = $messages[2];
+
             if (isset($messages[$vars['count']])) {
-                $message = $messages[$vars['count']];
+                $message = $messages[$vars['count']] ? $messages[$vars['count']] : array_pop($messages);
             }
         }
 
         $replace = [];
         foreach ($vars as $key => $value) {
-            if (! is_array($value) && ! is_object($value)) {
+            if (is_scalar($value) || is_null($value)) {
                 $replace['{'.$key.'}'] = $value;
             }
         }
