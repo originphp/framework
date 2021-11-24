@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.27.1] - 2021-11-24
+
+### Fixed
+
+- Fixed translation pluralization to use last item when more than 3 passed
+
 ## [3.27.0] - 2021-08-04
 
 ### Added
