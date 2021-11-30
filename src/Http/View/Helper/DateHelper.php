@@ -84,7 +84,7 @@ class DateHelper extends Helper
         foreach ($conditions as $seconds => $type) {
             $result = $difference / $seconds;
             if ($result >= 1) {
-                $final = round($result);
+                $final = floor($result);
                 if ($final > 1) {
                     $type .= 's'; // inflect
                 }
